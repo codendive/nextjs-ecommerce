@@ -6,7 +6,8 @@ import Carousel from '@/components/carousel'
 
 const Home = async () => {
   const products = await stripe.products.list({
-    expand: ['data.default_price']
+    expand: ['data.default_price'],
+    limit: 3
   })
 
   return (
