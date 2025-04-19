@@ -1,13 +1,30 @@
+'use client'
+
 import Stripe from 'stripe'
 import Image from 'next/image'
 import { Button } from './ui/button'
+import { useCartStore } from '@/store/cart-store'
 
 type Props = {
   product: Stripe.Product
 }
 
 const ProductDetail = ({ product }: Props) => {
+  const { items, addItem, removeItem } = useCartStore()
+
   const price = product.default_price as Stripe.Price
+  const cartItem = items.find((item) => item.id === product.id)
+  const quantity = cartItem ? cartItem.quantity : 0
+
+  const onAddItem = () => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: price.unit_amount as number,
+      imageUrl: product.images ? product.images[0] : null,
+      quantity: 1
+    })
+  }
 
   return (
     <div className='container flex flex-col items-center gap-8 px-4 py-8 mx-auto md:flex-row'>
@@ -33,9 +50,11 @@ const ProductDetail = ({ product }: Props) => {
           </p>
         )}
         <div className='flex items-center space-x-4'>
-          <Button variant='outline'>–</Button>
-          <span className='text-lg font-semibold'>0</span>
-          <Button>+</Button>
+          <Button variant='outline' onClick={() => removeItem(product.id)}>
+            –
+          </Button>
+          <span className='text-lg font-semibold'>{quantity}</span>
+          <Button onClick={onAddItem}>+</Button>
         </div>
       </div>
     </div>
